@@ -3,6 +3,7 @@ import LoginForm from '../components/LoginForm.vue';
 import RegisterForm from '../components/RegisterForm.vue';
 import Dashboard from '../components/Dashboard.vue';
 import AddAppartement from '../components/AddAppartement.vue';
+import ApartmentDetail from '../components/ApartmentDetail.vue'; // <-- NOUVEAU COMPOSANT
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -37,6 +38,12 @@ const router = createRouter({
       // Vous pourriez vouloir ajouter un méta-champ pour sécuriser cette route:
       // meta: { requiresAuth: true }
     },
+    {
+      path: '/apartment/:id', // L'ID de l'appartement sera ici
+      name: 'apartment-detail',
+      component: ApartmentDetail,
+      props: true // Permet de passer le paramètre ':id' comme prop au composant
+    }
   ]
 });
 

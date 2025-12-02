@@ -147,26 +147,25 @@ onMounted(() => {
 
       <div v-if="loadingApartments">Chargement de vos biens...</div>
       <div v-else-if="apartments.length > 0" class="apartment-grid">
-        <div v-for="(apt, index) in apartments" :key="apt.id" class="apartment-card">
-            <div class="card-info">
-                <h3>{{ apt.address }}</h3>
-                <p>{{ apt.city }}, {{ apt.postcode }}</p>
-                <p class="status-check">
-                    Statut VÉRIF. : 
-                    <span :class="{'checked': apt.to_check, 'unchecked': !apt.to_check}">
-                        {{ apt.to_check ? 'OUI' : 'NON' }}
-                    </span>
-                </p>
-            </div>
-            
-            <button 
-                @click="toggleCheckStatus(apt.id, apt.to_check, index)" 
-                class="toggle-button"
-            >
-                Basculer Vérification ({{ apt.to_check ? 'Fermer' : 'Ouvrir' }})
-            </button>
-        </div>
-      </div>
+<div v-for="(apt) in apartments" :key="apt.id">    
+<router-link :to="{ name: 'apartment-detail', params: { id: apt.id } }" class="apartment-card-link">
+
+                <div class="apartment-card">
+                    <div class="card-info">
+                        <h3>{{ apt.address }}</h3>
+                        <p>{{ apt.city }}</p>
+                        <p class="status-check">
+                            Statut VÉRIF. : 
+                            <span :class="{'checked': apt.to_check, 'unchecked': !apt.to_check}">
+                                {{ apt.to_check ? 'OUI' : 'NON' }}
+                            </span>
+                        </p>
+                    </div>
+                    
+                    </div>
+            </router-link>
+  </div>
+</div>
       <div v-else>
         <p>Vous n'avez pas encore enregistré d'appartement.</p>
       </div>
@@ -232,6 +231,41 @@ h1 { color: #35495e; }
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 20px;
 }
+
+/* Fichier : src/components/Dashboard.vue */
+
+/* ... autres styles ... */
+
+.add-button {
+  display: inline-block;
+  background-color: #42b883;
+  color: white;
+  padding: 10px 20px;
+  margin-bottom: 30px;
+  text-decoration: none; /* <-- Ajoutez ceci pour supprimer le soulignement */
+  border-radius: 5px;
+}
+
+/* ... autres styles ... */
+
+/* Si vous avez d'autres liens qui pourraient avoir un trait, comme le lien de retour */
+.back-link {
+    display: block;
+    margin-top: 15px;
+    color: #35495e;
+    text-decoration: none; /* <-- Ajout de cette ligne */
+}
+
+/* ... autres styles ... */
+/* Fichier : src/components/Dashboard.vue */
+
+/* ... autres styles ... */
+
+.apartment-card-link {
+    text-decoration: none; /* <-- SUPPRIME le soulignement de l'URL */
+    color: inherit; /* Pour que le texte à l'intérieur conserve la couleur par défaut */
+}
+
 .apartment-card {
     border: 1px solid #e0e0e0;
     border-radius: 8px;

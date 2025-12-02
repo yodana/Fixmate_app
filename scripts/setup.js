@@ -1,40 +1,30 @@
 import mysql from 'mysql2';
-import 'dotenv/config'; // Pour charger les variables d'environnement (si vous les utilisez)
+// import 'dotenv/config'; // Décommentez si vous utilisez un fichier .env
 
 // --- 1. Configuration de la Connexion ---
-// NOTE: On se connecte SANS spécifier la base de données au début, 
-// car on veut la créer si elle n'existe pas.
+// NOTE: Utilisez les mêmes identifiants que dans server.js.
+// On se connecte SANS spécifier la base de données au début.
 const dbConfig = {
-    host: 'localhost',
-    user: 'root', // Utilisez votre utilisateur MySQL
-    password: 'root', // ⚠️ REMPLACEZ ceci
-    port: 3306
+    host:  'localhost',
+    user:  'root', // ⚠️ VOTRE utilisateur MySQL
+    password:  'root', // ⚠️ VOTRE mot de passe
+    port:  3306
 };
 const DB_NAME = 'fixmate_db';
 
 // --- 2. Requêtes SQL pour la création des tables ---
-// Ceci est le code SQL complet que vous avez finalisé
+// L'ordre est important : les tables sans FK doivent être créées avant celles qui les référencent.
 const createTablesSQL = `
-    -- Si la base de données est déjà sélectionnée, supprime et recrée les tables
-    -- Les tables doivent être supprimées dans l'ordre inverse des dépendances (clés étrangères)
+    -- Désactive temporairement la vérification des clés étrangères pour les suppressions
+    SET FOREIGN_KEY_CHECKS = 0; 
+
+    -- Suppression des tables dans l'ordre inverse des dépendances
+    DROP TABLE IF EXISTS history_messages;
     DROP TABLE IF EXISTS user_relations;
-    DROP TABLE IF EXISTS users;
     DROP TABLE IF EXISTS apartments;
+    DROP TABLE IF EXISTS users; 
 
-    -- TABLE 1 : apartments (Propriétés)
-    CREATE TABLE apartments (
-        id INT(11) AUTO_INCREMENT PRIMARY KEY,
-        address VARCHAR(255) NOT NULL,
-        city VARCHAR(100) NOT NULL,
-        to_check BOOLEAN DEFAULT FALSE,
-        inventory JSON NULL COMMENT 'Liste des biens et équipements (JSON)',
-        owner_id INT(11) NOT NULL, -- Clé Étrangère vers users
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        
-        FOREIGN KEY (owner_id) REFERENCES users(id) ON DELETE CASCADE
-    );
-
-    -- TABLE 2 : users (Utilisateurs)
+    -- TABLE 1 : users (Le parent principal)
     CREATE TABLE users (
         id INT(11) AUTO_INCREMENT PRIMARY KEY,
         username VARCHAR(100) NOT NULL,
@@ -42,25 +32,56 @@ const createTablesSQL = `
         password_hash VARCHAR(255) NOT NULL,
         is_owner BOOLEAN DEFAULT FALSE,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        -- Note: apartment_id a été retiré de users
     );
 
-    -- TABLE 3 : user_relations (Relations Many-to-Many entre utilisateurs)
+    -- TABLE 2 : apartments (Dépend de users pour owner_id)
+    CREATE TABLE apartments (
+        id INT(11) AUTO_INCREMENT PRIMARY KEY,
+        address VARCHAR(255) NOT NULL,
+        city VARCHAR(100) NOT NULL,
+        inventory JSON NULL COMMENT 'Liste des biens et équipements',
+        to_check BOOLEAN DEFAULT FALSE,
+        
+        -- Clé Étrangère vers le propriétaire (users)
+        owner_id INT(11) NOT NULL, 
+        
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        
+        CONSTRAINT fk_owner_id 
+            FOREIGN KEY (owner_id) REFERENCES users(id) ON DELETE CASCADE
+    );
+    
+    -- TABLE 3 : user_relations (Dépend de users pour user_id et related_user_id)
     CREATE TABLE user_relations (
         user_id INT(11) NOT NULL,
         related_user_id INT(11) NOT NULL,
+        
         PRIMARY KEY (user_id, related_user_id),
+        
         CHECK (user_id != related_user_id),
-        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-        FOREIGN KEY (related_user_id) REFERENCES users(id) ON DELETE CASCADE
+        
+        CONSTRAINT fk_user_id 
+            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+        CONSTRAINT fk_related_user_id 
+            FOREIGN KEY (related_user_id) REFERENCES users(id) ON DELETE CASCADE
     );
 
-    -- Ajoute la table apartments après la table users (car apartments dépend de users)
-    -- NOTE: Le code ci-dessus est séquentiel, mais pour MySQL, il est plus simple de recréer l'ensemble.
-    -- La FK sur apartments doit être retardée ou faite après la création de users.
-    -- Je vais simplifier cela en m'assurant que l'ordre des CREATE est correct si vous exécutez le script d'un coup.
-    -- J'ai corrigé le script en enlevant la FK de apartments au début pour que users puisse être créé.
-    -- Le script ci-dessus est fonctionnel si exécuté séquentiellement.
+    -- TABLE 4 : history_messages (Dépend de apartments et users)
+    CREATE TABLE history_messages (
+        id INT(11) AUTO_INCREMENT PRIMARY KEY,
+        apartment_id INT(11) NOT NULL,
+        sender_id INT(11) NULL, 
+        message_content TEXT NOT NULL, 
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        
+        CONSTRAINT fk_apartment_history 
+            FOREIGN KEY (apartment_id) REFERENCES apartments(id) ON DELETE CASCADE,
+        CONSTRAINT fk_sender_history 
+            FOREIGN KEY (sender_id) REFERENCES users(id) ON DELETE SET NULL
+    );
+
+    -- Réactive la vérification des clés étrangères
+    SET FOREIGN_KEY_CHECKS = 1; 
 `;
 
 // --- 3. Fonction principale d'initialisation ---
@@ -88,21 +109,16 @@ async function setupDatabase() {
 
         // 3.3. Exécuter toutes les requêtes de création de tables
         console.log(`Début de la création des tables...`);
-        const statements = createTablesSQL.split(';').filter(s => s.trim().length > 0);
+        // La méthode d'exécution de mysql2 permet d'exécuter plusieurs requêtes d'un coup
+        const [results] = await connection.promise().query(createTablesSQL);
         
-        for (const statement of statements) {
-            await connection.promise().query(statement);
-        }
+        // Vous pouvez loguer les résultats si vous voulez: console.log(results);
         
-        console.log(`\n🎉 Toutes les tables (users, apartments, user_relations) ont été créées/mises à jour avec succès dans '${DB_NAME}'.`);
+        console.log(`\n🎉 Toutes les tables ont été créées/mises à jour avec succès dans '${DB_NAME}'.`);
 
     } catch (error) {
-        if (error.code === 'ER_BAD_DB_ERROR' && error.sqlMessage.includes('Unknown database')) {
-             console.error(`Erreur: La base de données '${DB_NAME}' n'a pas pu être créée. Vérifiez les privilèges de l'utilisateur.`);
-        } else {
-             console.error(`\n❌ Erreur critique lors du setup de la base de données:`, error.message);
-             console.error(`Code erreur: ${error.code}`);
-        }
+        console.error(`\n❌ Erreur critique lors du setup de la base de données:`, error.message);
+        console.error(`Code erreur: ${error.code}`);
     } finally {
         connection.end();
     }

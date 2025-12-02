@@ -13,7 +13,16 @@ const db = mysql.createConnection({
   host: 'localhost',      
   user: 'root',           // Utilisez votre nouvel utilisateur créé
   password: 'root', // ⚠️ REMPLACER par le mot de passe de 'admin_vue'
-  database: 'fixmate_db'      // Le nom de votre base de données
+  database: 'fixmate_db' ,     // Le nom de votre base de données
+  typeCast: function (field, next) {
+    if (field.type === 'TINY' && field.length === 1) {
+      // Pour les colonnes TINYINT(1) (souvent utilisées pour les booléens)
+      const value = field.string();
+      // Si la valeur est '1' ou '0', retourne le nombre.
+      return value === null ? null : (value === '1' ? 1 : 0);
+    }
+    return next();
+  }
 });
 
 // 3. Tester et établir la connexion
@@ -53,3 +62,4 @@ app.get('/api/status', (req, res) => {
 app.listen(port, () => {
   console.log(`🚀 API backend démarrée sur http://localhost:${port}`);
 });
+
