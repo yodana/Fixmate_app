@@ -8,7 +8,8 @@ const dbConfig = {
     host:  'localhost',
     user:  'root', // ⚠️ VOTRE utilisateur MySQL
     password:  'root', // ⚠️ VOTRE mot de passe
-    port:  3306
+    port:  3306,
+    multipleStatements: true,
 };
 const DB_NAME = 'fixmate_db';
 
@@ -79,6 +80,25 @@ const createTablesSQL = `
         CONSTRAINT fk_sender_history 
             FOREIGN KEY (sender_id) REFERENCES users(id) ON DELETE SET NULL
     );
+
+    -- TABLE 5 : photos (Dépend de apartments)
+        CREATE TABLE IF NOT EXISTS photos (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        apartment_id INT NOT NULL,
+        photo_url VARCHAR(500) NOT NULL,
+        message TEXT,
+        status ENUM('pending', 'approved', 'rejected') DEFAULT 'pending',
+        uploaded_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        uploaded_by VARCHAR(100),
+        reviewed_at DATETIME NULL,
+        reviewed_by VARCHAR(100),
+        feedback TEXT,
+        FOREIGN KEY (apartment_id) REFERENCES apartments(id) ON DELETE CASCADE,
+        INDEX idx_apartment (apartment_id),
+        INDEX idx_status (status),
+        INDEX idx_uploaded_at (uploaded_at)
+    );
+
 
     -- Réactive la vérification des clés étrangères
     SET FOREIGN_KEY_CHECKS = 1; 
