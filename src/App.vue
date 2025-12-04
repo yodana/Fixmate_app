@@ -56,7 +56,7 @@ watch(
 <style scoped>
 header {
   line-height: 1.5;
-  background-color: #f8f8f8;
+  background-color: #FFFFFF;
   padding: 20px 0;
   border-bottom: 1px solid #eee;
 }
