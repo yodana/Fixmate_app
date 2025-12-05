@@ -193,11 +193,20 @@ onMounted(() => {
                   {{ apt.to_check ? 'À VÉRIFIER' : 'VÉRIFIÉ' }}
                 </div>
               </div>
-              <div class="card-arrow">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <line x1="5" y1="12" x2="19" y2="12"></line>
-                  <polyline points="12 5 19 12 12 19"></polyline>
-                </svg>
+              <div class="card-actions">
+                <button @click.prevent="openPhotoUpload(apt.id)" class="photo-btn" title="Gérer les photos">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                    <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                    <polyline points="21 15 16 10 5 21"></polyline>
+                  </svg>
+                </button>
+                <div class="card-arrow">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                    <polyline points="12 5 19 12 12 19"></polyline>
+                  </svg>
+                </div>
               </div>
             </div>
           </router-link>
@@ -240,22 +249,24 @@ onMounted(() => {
 
           <div v-else-if="linkedApartments.length > 0" class="apartment-grid">
             <div v-for="apt in linkedApartments" :key="apt.id" class="check-apartment-card">
-              <div class="card-icon check-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-                  <polyline points="9 22 9 12 15 12 15 22"></polyline>
-                </svg>
-              </div>
-              <div class="card-content">
-                <h3>{{ apt.address }}</h3>
-                <p class="city">{{ apt.city }}</p>
-                <p class="owner-info">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                    <circle cx="12" cy="7" r="4"></circle>
+              <div class="card-header-flex">
+                <div class="card-icon check-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
                   </svg>
-                  {{ apt.owner_username }}
-                </p>
+                </div>
+                <div class="card-content">
+                  <h3>{{ apt.address }}</h3>
+                  <p class="city">{{ apt.city }}</p>
+                  <p class="owner-info">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                      <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                    {{ apt.owner_username }}
+                  </p>
+                </div>
               </div>
               <button class="send-photo-button" @click="openPhotoUpload(apt.id)">
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -343,8 +354,9 @@ onMounted(() => {
         </button>
         <PhotoUpload
           :apartment-id="selectedApartmentId"
-          role="cleaner"
+          :role="isOwner ? 'owner' : 'cleaner'"
           @photos-uploaded="closePhotoUpload"
+          @close="closePhotoUpload"
         />
       </div>
     </div>
@@ -352,9 +364,7 @@ onMounted(() => {
 </template>
 
 <style scoped>
-* {
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
 .dashboard-page {
   min-height: 100vh;
@@ -363,12 +373,8 @@ onMounted(() => {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
 }
 
-.dashboard-container {
-  max-width: 1200px;
-  margin: 0 auto;
-}
+.dashboard-container { max-width: 1200px; margin: 0 auto; }
 
-/* Dashboard Header */
 .dashboard-header {
   display: flex;
   justify-content: space-between;
@@ -380,15 +386,10 @@ onMounted(() => {
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
 }
 
-.welcome-section {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-}
+.welcome-section { display: flex; align-items: center; gap: 20px; }
 
 .avatar {
-  width: 64px;
-  height: 64px;
+  width: 64px; height: 64px;
   background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
   border-radius: 50%;
   display: flex;
@@ -397,16 +398,9 @@ onMounted(() => {
   flex-shrink: 0;
 }
 
-.avatar svg {
-  color: #667eea;
-}
+.avatar svg { color: #667eea; }
 
-.welcome-text h1 {
-  margin: 0 0 8px 0;
-  font-size: 28px;
-  color: #1a202c;
-  font-weight: 700;
-}
+.welcome-text h1 { margin: 0 0 8px 0; font-size: 28px; color: #1a202c; font-weight: 700; }
 
 .role-badge {
   display: inline-block;
@@ -449,7 +443,6 @@ onMounted(() => {
   box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
 }
 
-/* Section Headers */
 .section-header {
   display: flex;
   justify-content: space-between;
@@ -457,12 +450,7 @@ onMounted(() => {
   margin-bottom: 24px;
 }
 
-.section-header h2 {
-  margin: 0;
-  font-size: 24px;
-  color: white;
-  font-weight: 700;
-}
+.section-header h2 { margin: 0; font-size: 24px; color: white; font-weight: 700; }
 
 .add-button {
   display: flex;
@@ -479,42 +467,21 @@ onMounted(() => {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-.add-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-}
+.add-button:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15); }
 
-/* Loading State */
-.loading-state {
-  background: white;
-  border-radius: 16px;
-  padding: 60px;
-  text-align: center;
-}
+.loading-state { background: white; border-radius: 16px; padding: 60px; text-align: center; }
 
-.loading-state .spinner {
-  color: #667eea;
-  animation: spin 1s linear infinite;
-  margin-bottom: 16px;
-}
+.loading-state .spinner { color: #667eea; animation: spin 1s linear infinite; margin-bottom: 16px; }
 
-.loading-state p {
-  color: #718096;
-  font-size: 16px;
-  margin: 0;
-}
+.loading-state p { color: #718096; font-size: 16px; margin: 0; }
 
-/* Apartment Grid */
 .apartment-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   gap: 24px;
 }
 
-.apartment-card-link {
-  text-decoration: none;
-  display: block;
-}
+.apartment-card-link { text-decoration: none; display: block; }
 
 .apartment-card {
   background: white;
@@ -525,17 +492,12 @@ onMounted(() => {
   gap: 20px;
   transition: all 0.3s ease;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  position: relative;
 }
 
-.apartment-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
-}
+.apartment-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15); }
 
 .card-icon {
-  width: 56px;
-  height: 56px;
+  width: 56px; height: 56px;
   background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
   border-radius: 12px;
   display: flex;
@@ -544,22 +506,12 @@ onMounted(() => {
   flex-shrink: 0;
 }
 
-.card-icon svg {
-  color: #667eea;
-}
+.card-icon svg { color: #667eea; }
 
-.check-icon {
-  background: rgba(245, 158, 11, 0.1);
-}
+.check-icon { background: rgba(245, 158, 11, 0.1); }
+.check-icon svg { color: #f59e0b; }
 
-.check-icon svg {
-  color: #f59e0b;
-}
-
-.card-content {
-  flex: 1;
-  min-width: 0;
-}
+.card-content { flex: 1; min-width: 0; }
 
 .card-content h3 {
   margin: 0 0 6px 0;
@@ -571,11 +523,7 @@ onMounted(() => {
   text-overflow: ellipsis;
 }
 
-.city {
-  margin: 0 0 12px 0;
-  font-size: 14px;
-  color: #718096;
-}
+.city { margin: 0 0 12px 0; font-size: 14px; color: #718096; }
 
 .owner-info {
   margin: 0;
@@ -586,9 +534,7 @@ onMounted(() => {
   gap: 6px;
 }
 
-.owner-info svg {
-  color: #a0aec0;
-}
+.owner-info svg { color: #a0aec0; }
 
 .status-badge {
   display: inline-flex;
@@ -600,30 +546,39 @@ onMounted(() => {
   font-weight: 600;
 }
 
-.status-pending {
-  background: #fef3cd;
-  color: #d97706;
-  border: 1px solid #fbbf24;
+.status-pending { background: #fef3cd; color: #d97706; border: 1px solid #fbbf24; }
+.status-verified { background: #d1fae5; color: #065f46; border: 1px solid #34d399; }
+
+.card-arrow { flex-shrink: 0; color: #cbd5e0; transition: all 0.3s ease; }
+
+.apartment-card:hover .card-arrow { color: #667eea; transform: translateX(4px); }
+
+.card-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
-.status-verified {
-  background: #d1fae5;
-  color: #065f46;
-  border: 1px solid #34d399;
-}
-
-.card-arrow {
-  flex-shrink: 0;
-  color: #cbd5e0;
+.photo-btn {
+  width: 40px;
+  height: 40px;
+  background: #667eea;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
   transition: all 0.3s ease;
+  flex-shrink: 0;
 }
 
-.apartment-card:hover .card-arrow {
-  color: #667eea;
-  transform: translateX(4px);
+.photo-btn:hover {
+  background: #5a67d8;
+  transform: scale(1.1);
 }
 
-/* Check Apartment Card */
 .check-apartment-card {
   background: white;
   border-radius: 16px;
@@ -635,10 +590,9 @@ onMounted(() => {
   transition: all 0.3s ease;
 }
 
-.check-apartment-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
-}
+.check-apartment-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15); }
+
+.card-header-flex { display: flex; align-items: center; gap: 16px; }
 
 .send-photo-button {
   display: flex;
