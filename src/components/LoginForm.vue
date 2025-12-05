@@ -18,7 +18,7 @@ const submitLogin = async () => {
   
   // Validation simple
   if (!email.value || !password.value) {
-    errorMessage.value = 'Veuillez remplir tous les champs.';
+    errorMessage.value = 'Please fill in all fields.';
     return;
   }
 
@@ -45,7 +45,7 @@ const submitLogin = async () => {
     // 2. Stocker les infos de l'utilisateur (y compris is_owner)
     localStorage.setItem('userData', JSON.stringify(user));
 
-    successMessage.value = response.data.message || 'Connexion réussie !';
+    successMessage.value = response.data.message || 'Login successful !';
 
     // 3. Rediriger vers la page Dashboard (qui gérera la logique is_owner)
     setTimeout(() => {
@@ -56,10 +56,10 @@ const submitLogin = async () => {
     // 4. Gestion des erreurs de l'API
     if (error.response) {
       // Erreur API (401 Identifiants invalides, 400 Champs manquants)
-      errorMessage.value = error.response.data.message || 'Erreur lors de la connexion.';
+      errorMessage.value = error.response.data.message || 'Error during login.';
     } else {
       // Erreur réseau ou serveur non disponible
-      errorMessage.value = 'Erreur réseau. Impossible de contacter le serveur.';
+      errorMessage.value = 'Network error. Unable to contact the server.';
     }
   } finally {
     // 5. Arrêter l'état de chargement
@@ -72,8 +72,8 @@ const submitLogin = async () => {
   <div class="login-page">
     <div class="form-container">
       <div class="header">
-        <h2>Connexion</h2>
-        <p class="subtitle">Connectez-vous à votre compte</p>
+        <h2>Login</h2>
+        <p class="subtitle">Login to your account</p>
       </div>
       
       <div v-if="errorMessage" class="alert alert-error">
@@ -95,17 +95,17 @@ const submitLogin = async () => {
 
       <form @submit.prevent="submitLogin">
         <div class="form-group">
-          <label for="login-email">Adresse email</label>
+          <label for="login-email">Email</label>
           <input type="email" id="login-email" v-model="email" required placeholder="exemple@email.com">
         </div>
 
         <div class="form-group">
-          <label for="login-password">Mot de passe</label>
-          <input type="password" id="login-password" v-model="password" required placeholder="Votre mot de passe">
+          <label for="login-password">Password</label>
+          <input type="password" id="login-password" v-model="password" required placeholder="Your password">
         </div>
 
         <button type="submit" class="submit-button" :disabled="isLoading">
-          <span v-if="!isLoading">Se connecter</span>
+          <span v-if="!isLoading">Login</span>
           <span v-else class="loading">
             <svg class="spinner" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <line x1="12" y1="2" x2="12" y2="6"></line>
@@ -117,12 +117,12 @@ const submitLogin = async () => {
               <line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line>
               <line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line>
             </svg>
-            Connexion en cours...
+            Login in progress
           </span>
         </button>
 
         <div class="register-link">
-          Pas encore de compte ? <router-link to="/register">S'inscrire</router-link>
+          No account ? <router-link to="/register">Register</router-link>
         </div>
       </form>
     </div>

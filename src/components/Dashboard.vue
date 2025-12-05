@@ -61,10 +61,10 @@ const linkOwner = async (ownerId, ownerUsername) => {
       user_id: userId.value,
       owner_id: ownerId
     });
-    alert(`Liaison établie avec ${ownerUsername} !`);
+    alert(`Link established with ${ownerUsername}!`);
     await fetchApartmentsToCheck();
   } catch (err) {
-    alert("Erreur lors de la liaison: " + (err.response?.data?.message || "Erreur réseau."));
+    alert("Error linking: " + (err.response?.data?.message || "Network error."));
   }
 };
 
@@ -120,7 +120,7 @@ onMounted(() => {
             </svg>
           </div>
           <div class="welcome-text">
-            <h1>Bienvenue, {{ userName }} !</h1>
+            <h1>Welcome, {{ userName }}!</h1>
             <p class="role-badge" :class="isOwner ? 'role-owner' : 'role-cleaner'">
               {{ isOwner ? 'Property Manager' : 'Cleaner' }}
             </p>
@@ -132,20 +132,20 @@ onMounted(() => {
             <polyline points="16 17 21 12 16 7"></polyline>
             <line x1="21" y1="12" x2="9" y2="12"></line>
           </svg>
-          Déconnexion
+          Log Out
         </button>
       </div>
 
       <!-- Owner View -->
       <div v-if="isOwner" class="owner-view">
         <div class="section-header">
-          <h2>Vos Biens Immobiliers</h2>
+          <h2>Your Real Estate Properties</h2>
           <router-link to="/add-apartment" class="add-button">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <line x1="12" y1="5" x2="12" y2="19"></line>
               <line x1="5" y1="12" x2="19" y2="12"></line>
             </svg>
-            Ajouter un appartement
+            Add an apartment
           </router-link>
         </div>
 
@@ -160,7 +160,7 @@ onMounted(() => {
             <line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line>
             <line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line>
           </svg>
-          <p>Chargement de vos biens...</p>
+          <p>Loading your properties...</p>
         </div>
 
         <div v-else-if="apartments.length > 0" class="apartment-grid">
@@ -217,10 +217,10 @@ onMounted(() => {
             <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
             <polyline points="9 22 9 12 15 12 15 22"></polyline>
           </svg>
-          <h3>Aucun appartement enregistré</h3>
-          <p>Commencez par ajouter votre premier bien immobilier</p>
+          <h3>No apartments registered</h3>
+          <p>Start by adding your first property</p>
           <router-link to="/add-apartment" class="empty-action-button">
-            Ajouter un appartement
+            Add an apartment
           </router-link>
         </div>
       </div>
@@ -230,7 +230,7 @@ onMounted(() => {
         <!-- Apartments to Check Section -->
         <div class="section">
           <div class="section-header">
-            <h2>Appartements à Vérifier</h2>
+            <h2>Apartment to Verify</h2>
           </div>
 
           <div v-if="loadingLinkedApts" class="loading-state">
@@ -244,7 +244,7 @@ onMounted(() => {
               <line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line>
               <line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line>
             </svg>
-            <p>Chargement des biens à vérifier...</p>
+            <p>Loading apartments to verify...</p>
           </div>
 
           <div v-else-if="linkedApartments.length > 0" class="apartment-grid">
@@ -273,7 +273,7 @@ onMounted(() => {
                   <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
                   <circle cx="12" cy="13" r="4"></circle>
                 </svg>
-                Envoyer des photos
+                Send Photos
               </button>
             </div>
           </div>
@@ -283,8 +283,8 @@ onMounted(() => {
               <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
               <polyline points="22 4 12 14.01 9 11.01"></polyline>
             </svg>
-            <h3>Aucun appartement à vérifier</h3>
-            <p>Aucun bien n'est actuellement marqué pour vérification</p>
+            <h3>No apartments to verify</h3>
+            <p>No property is currently marked for verification</p>
           </div>
         </div>
 
@@ -293,7 +293,7 @@ onMounted(() => {
         <!-- Link to Owner Section -->
         <div class="section">
           <div class="section-header">
-            <h2>Lier à un Propriétaire</h2>
+            <h2>Link to Owner</h2>
           </div>
 
           <div v-if="loadingOwners" class="loading-state">
@@ -307,7 +307,7 @@ onMounted(() => {
               <line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line>
               <line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line>
             </svg>
-            <p>Chargement des propriétaires...</p>
+            <p>Loading owners...</p>
           </div>
 
           <div v-else-if="allOwners.length > 0" class="owners-grid">
@@ -324,7 +324,7 @@ onMounted(() => {
                   <line x1="12" y1="5" x2="12" y2="19"></line>
                   <line x1="5" y1="12" x2="19" y2="12"></line>
                 </svg>
-                Ajouter
+                Associate with this owner
               </button>
             </div>
           </div>
@@ -336,8 +336,8 @@ onMounted(() => {
               <line x1="22" y1="21" x2="16" y2="15"></line>
               <line x1="16" y1="21" x2="22" y2="15"></line>
             </svg>
-            <h3>Aucun propriétaire disponible</h3>
-            <p>Aucun propriétaire trouvé dans la base de données</p>
+            <h3>No owners available</h3>
+            <p>No owners found in the database</p>
           </div>
         </div>
       </div>

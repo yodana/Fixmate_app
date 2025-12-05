@@ -25,9 +25,9 @@ const submitApartment = async () => {
   errorMessage.value = '';
   successMessage.value = '';
 
-  // Validation simple
+  // Simple validation
   if (!address.value || !city.value) {
-    errorMessage.value = 'Veuillez remplir au moins l\'adresse et la ville.';
+    errorMessage.value = 'Please fill in at least the address and city.';
     return;
   }
 
@@ -43,12 +43,12 @@ const submitApartment = async () => {
         const [, qty, name] = match;
         inventoryJson[name.trim()] = qty.trim();
       } else {
-        throw new Error(`Format invalide pour l'article : "${item}"`);
+        throw new Error(`Invalid format for item: "${item}"`);
       }
     });
 
   } catch (e) {
-    errorMessage.value = e.message || "Erreur dans l'inventaire.";
+    errorMessage.value = e.message || "Error in inventory.";
     return;
   }
 
@@ -73,7 +73,7 @@ const submitApartment = async () => {
     // ----------------------------------------------------
     const response = await axios.post('http://localhost:3000/api/apartments/add', apartmentData);
 
-    successMessage.value = response.data.message || 'Appartement ajouté avec succès !';
+    successMessage.value = response.data.message || 'Apartment added successfully!';
 
     // 3. Redirection vers le dashboard après 1.5 secondes
     setTimeout(() => {
@@ -83,12 +83,12 @@ const submitApartment = async () => {
   } catch (error) {
     // 4. Gestion des erreurs de l'API
     if (error.response) {
-      errorMessage.value = error.response.data.message || 'Erreur lors de l\'ajout de l\'appartement.';
+      errorMessage.value = error.response.data.message || 'Error adding apartment.';
     } else {
-      errorMessage.value = 'Erreur réseau. Impossible de contacter le serveur API.';
+      errorMessage.value = 'Network error. Unable to contact API server.';
     }
   } finally {
-    // 5. Arrêter l'état de chargement
+    // 5. Stop loading state
     isLoading.value = false;
   }
 };
@@ -98,8 +98,8 @@ const submitApartment = async () => {
   <div class="apartment-page">
     <div class="form-container">
       <div class="header">
-        <h2>Ajouter un Nouvel Appartement</h2>
-        <p class="subtitle">Enregistrez les détails de votre propriété</p>
+        <h2>Add a New Apartment</h2>
+        <p class="subtitle">Register the details of your property</p>
       </div>
       
       <div v-if="errorMessage" class="alert alert-error">
@@ -121,31 +121,31 @@ const submitApartment = async () => {
 
       <form @submit.prevent="submitApartment">
         <div class="form-group">
-          <label for="address">Adresse complète</label>
+          <label for="address">Complete Address</label>
           <input type="text" id="address" v-model="address" required placeholder="123 Rue de la Paix">
         </div>
 
         <div class="form-row">
           <div class="form-group">
-            <label for="city">Ville</label>
+            <label for="city">City</label>
             <input type="text" id="city" v-model="city" required placeholder="Paris">
           </div>
 
           <div class="form-group">
-            <label for="postcode">Code Postal</label>
+            <label for="postcode">Postal Code</label>
             <input type="text" id="postcode" v-model="postcode" placeholder="75001">
           </div>
         </div>
         
        <div class="form-group">
-        <label for="inventory">Inventaire</label>
+        <label for="inventory">Inventory</label>
         <textarea 
           id="inventory" 
           v-model="inventoryText" 
           rows="5" 
-          placeholder="1 TV, 1 Canapé, 2 Chaises, 1 Table">
+          placeholder="1 TV, 1 Sofa, 2 Chairs, 1 Table">
         </textarea>
-        <small class="helper-text">Liste: chiffre puis nom du bien, séparés par des virgules</small>
+        <small class="helper-text">List items as quantity item_name, separated by commas</small>
       </div>
 
         
@@ -156,8 +156,8 @@ const submitApartment = async () => {
               <polyline points="22 4 12 14.01 9 11.01"></polyline>
             </svg>
             <div class="verification-content">
-              <h4>Vérification immédiate</h4>
-              <p>Marquer cet appartement pour une vérification prioritaire</p>
+              <h4>Immediate Verification</h4>
+              <p>Mark this apartment for priority verification</p>
             </div>
           </div>
           <label class="switch">
@@ -173,7 +173,7 @@ const submitApartment = async () => {
               <polyline points="17 21 17 13 7 13 7 21"></polyline>
               <polyline points="7 3 7 8 15 8"></polyline>
             </svg>
-            Enregistrer l'Appartement
+            Save Apartment
           </span>
           <span v-else class="loading">
             <svg class="spinner" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -186,7 +186,7 @@ const submitApartment = async () => {
               <line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line>
               <line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line>
             </svg>
-            Enregistrement...
+            Saving...
           </span>
         </button>
 
@@ -195,7 +195,7 @@ const submitApartment = async () => {
             <line x1="19" y1="12" x2="5" y2="12"></line>
             <polyline points="12 19 5 12 12 5"></polyline>
           </svg>
-          Retour au Dashboard
+          Return to Dashboard
         </router-link>
       </form>
     </div>

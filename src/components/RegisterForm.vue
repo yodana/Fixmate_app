@@ -23,12 +23,12 @@ const submitRegister = async () => {
   
   // Validation simple
   if (!username.value || !email.value || !password.value || !confirmPassword.value) {
-    errorMessage.value = 'Veuillez remplir tous les champs.';
+    errorMessage.value = 'Please fill in all fields.';
     return;
   }
   
   if (password.value !== confirmPassword.value) {
-    errorMessage.value = 'Les mots de passe ne correspondent pas.';
+    errorMessage.value = 'Passwords do not match.';
     return;
   }
 
@@ -50,8 +50,8 @@ const submitRegister = async () => {
     const response = await axios.post('http://localhost:3000/api/auth/register', userData);
 
     // Si la réponse est 201 (Créé)
-    successMessage.value = response.data.message || 'Inscription réussie !';
-    
+    successMessage.value = response.data.message || 'Registration successful !';
+
     // 3. Effacer et réinitialiser le formulaire
     username.value = '';
     email.value = '';
@@ -68,10 +68,10 @@ const submitRegister = async () => {
     // 5. Gestion des erreurs de l'API (409, 400, 500)
     if (error.response) {
         // Erreur reçue de l'API (ex: 409 Conflict - Email déjà utilisé)
-        errorMessage.value = error.response.data.message || 'Erreur lors de l\'inscription.';
+        errorMessage.value = error.response.data.message || 'Error during registration.';
     } else {
         // Erreur réseau ou API non disponible
-        errorMessage.value = 'Erreur réseau. Le serveur API est-il démarré sur le port 3000 ?';
+        errorMessage.value = 'Network error. Is the API server running on port 3000?';
         console.error("Détails de l'erreur réseau:", error);
     }
   } finally {
@@ -85,8 +85,8 @@ const submitRegister = async () => {
   <div class="registration-page">
     <div class="form-container">
       <div class="header">
-        <h2>Créer un compte</h2>
-        <p class="subtitle">Rejoignez notre plateforme de gestion immobilière</p>
+        <h2>Create an account</h2>
+        <p class="subtitle">Join our property management platform</p>
       </div>
       
       <div v-if="errorMessage" class="alert alert-error">
@@ -109,7 +109,7 @@ const submitRegister = async () => {
       <form @submit.prevent="submitRegister">
         <!-- Role Selection -->
         <div class="role-selection">
-          <label class="role-label">Je suis :</label>
+          <label class="role-label">I am :</label>
           <div class="role-cards">
             <div 
               class="role-card" 
@@ -122,7 +122,7 @@ const submitRegister = async () => {
                 </svg>
               </div>
               <h3>Cleaner</h3>
-              <p>Je propose mes services de ménage</p>
+              <p>I offer cleaning services</p>
               <div class="check-mark">
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
                   <polyline points="20 6 9 17 4 12"></polyline>
@@ -142,7 +142,7 @@ const submitRegister = async () => {
                 </svg>
               </div>
               <h3>Property Manager</h3>
-              <p>Je gère des biens immobiliers</p>
+              <p>I manage real estate properties</p>
               <div class="check-mark">
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
                   <polyline points="20 6 9 17 4 12"></polyline>
@@ -153,27 +153,27 @@ const submitRegister = async () => {
         </div>
 
         <div class="form-group">
-          <label for="register-username">Nom d'utilisateur</label>
-          <input type="text" id="register-username" v-model="username" required placeholder="Entrez votre nom d'utilisateur">
+          <label for="register-username">Username</label>
+          <input type="text" id="register-username" v-model="username" required placeholder="Enter your username">
         </div>
 
         <div class="form-group">
-          <label for="register-email">Adresse email</label>
-          <input type="email" id="register-email" v-model="email" required placeholder="exemple@email.com">
+          <label for="register-email">Email Address</label>
+          <input type="email" id="register-email" v-model="email" required placeholder="example@email.com">
         </div>
 
         <div class="form-group">
-          <label for="register-password">Mot de passe</label>
-          <input type="password" id="register-password" v-model="password" required placeholder="Minimum 8 caractères">
+          <label for="register-password">Password</label>
+          <input type="password" id="register-password" v-model="password" required placeholder="Minimum 8 characters">
         </div>
 
         <div class="form-group">
-          <label for="confirm-password">Confirmer le mot de passe</label>
-          <input type="password" id="confirm-password" v-model="confirmPassword" required placeholder="Retapez votre mot de passe">
+          <label for="confirm-password">Confirm Password</label>
+          <input type="password" id="confirm-password" v-model="confirmPassword" required placeholder="Retype your password">
         </div>
 
         <button type="submit" class="submit-button" :disabled="isLoading">
-          <span v-if="!isLoading">S'inscrire</span>
+          <span v-if="!isLoading">Sign Up</span>
           <span v-else class="loading">
             <svg class="spinner" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <line x1="12" y1="2" x2="12" y2="6"></line>
@@ -185,12 +185,12 @@ const submitRegister = async () => {
               <line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line>
               <line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line>
             </svg>
-            Inscription en cours...
+            Sign Up in progress...
           </span>
         </button>
 
         <div class="login-link">
-          Vous avez déjà un compte ? <router-link to="/login">Se connecter</router-link>
+          You already have an account? <router-link to="/login">Log In</router-link>
         </div>
       </form>
     </div>
