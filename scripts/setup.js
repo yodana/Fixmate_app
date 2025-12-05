@@ -99,6 +99,16 @@ const createTablesSQL = `
         INDEX idx_uploaded_at (uploaded_at)
     );
 
+    -- Vérifier les données existantes
+        SELECT * FROM photos;
+
+        -- Vérifier le nombre de photos par appartement
+        SELECT apartment_id, COUNT(*) as total, 
+            SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as pending,
+            SUM(CASE WHEN status = 'approved' THEN 1 ELSE 0 END) as approved,
+            SUM(CASE WHEN status = 'rejected' THEN 1 ELSE 0 END) as rejected
+        FROM photos 
+        GROUP BY apartment_id;
 
     -- Réactive la vérification des clés étrangères
     SET FOREIGN_KEY_CHECKS = 1; 
