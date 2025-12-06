@@ -68,9 +68,9 @@
         
         let message = '';
         if (newStatus === 1) {
-            message = "Apartment marked as **TO CHECK** (to_check: YES).";
+            message = "Apartment marked as **TO CHECK**.";
         } else {
-            message = "Apartment marked as **VERIFIED** (to_check: NO).";
+            message = "Apartment marked as **VERIFIED**.";
         }
 
         try {

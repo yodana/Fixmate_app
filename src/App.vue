@@ -39,8 +39,8 @@ watch(
         <router-link to="/" class="nav-brand">FixMate</router-link>
         
         <template v-if="!isAuthenticated">
-          <router-link to="/login" class="nav-link">Connexion</router-link>
-          <router-link to="/register" class="nav-link">Inscription</router-link>
+          <router-link to="/login" class="nav-link">Log in</router-link>
+          <router-link to="/register" class="nav-link">Sign up</router-link>
         </template>
         
         <template v-else>

@@ -190,11 +190,11 @@ onMounted(() => {
                     <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
                     <polyline points="22 4 12 14.01 9 11.01"></polyline>
                   </svg>
-                  {{ apt.to_check ? 'À VÉRIFIER' : 'VÉRIFIÉ' }}
+                  {{ apt.to_check ? 'TO BE VERIFIED' : 'VERIFIED' }}
                 </div>
               </div>
               <div class="card-actions">
-                <button @click.prevent="openPhotoUpload(apt.id)" class="photo-btn" title="Gérer les photos">
+                <button @click.prevent="openPhotoUpload(apt.id)" class="photo-btn" title="Manage Photos">
                   <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
                     <circle cx="8.5" cy="8.5" r="1.5"></circle>

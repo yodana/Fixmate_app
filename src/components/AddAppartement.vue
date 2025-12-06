@@ -10,7 +10,7 @@ const userId = userData ? userData.id : null; // Récupère l'ID
 const address = ref('');
 const city = ref('');
 const postcode = ref('');
-const inventoryText = ref('1 TV, 1 Canapé, 2 Chaises, 1 Table'); 
+const inventoryText = ref('1 TV, 1 Sofa, 2 Chairs, 1 Table'); 
 const isOwner = ref(true); // Utilisateur connecté est propriétaire ici
 const toCheck = ref(false); // NOUVEAU: Statut de vérification, par défaut à false
 

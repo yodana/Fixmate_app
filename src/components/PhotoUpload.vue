@@ -97,11 +97,11 @@ async function uploadPhotos() {
     message.value = '';
     await loadPhotos();
     await loadStats();
-    alert(`✅ ${res.data.photos.length} photo(s) uploadée(s) avec succès !`);
+    alert(`✅ ${res.data.photos.length} photo(s) uploaded successfully!`);
   } catch (e) {
     console.error('❌ Upload error:', e);
     console.error('Error response:', e.response?.data);
-    alert('❌ Erreur lors de l\'upload : ' + (e.response?.data?.error || e.message));
+    alert('❌ Error uploading photos: ' + (e.response?.data?.error || e.message));
   } finally {
     uploading.value = false;
   }
@@ -148,8 +148,8 @@ async function loadStats() {
 
 // ---------- Approve / Reject ----------
 async function approvePhoto(photoId) {
-  if (!confirm('Approuver cette photo ?')) return;
-  
+  if (!confirm('Approve this photo?')) return;
+
   processing.value = true;
   console.log('✅ Approving photo:', photoId);
   
@@ -164,12 +164,12 @@ async function approvePhoto(photoId) {
     
     await loadPhotos();
     await loadStats();
-    alert('✅ Photo approuvée !');
+    alert('✅ Photo approved!');
   } catch (e) {
     console.error('❌ Approve error:', e);
     console.error('Error response:', e.response?.data);
     console.error('Request URL:', e.config?.url);
-    alert('❌ Erreur lors de l\'approbation : ' + (e.response?.data?.error || e.message));
+    alert('❌ Error approving photo: ' + (e.response?.data?.error || e.message));
   } finally {
     processing.value = false;
   }
@@ -206,12 +206,12 @@ async function confirmReject() {
     await loadPhotos();
     await loadStats();
     closeRejectModal();
-    alert('✅ Photo rejetée');
+    alert('✅ Photo rejected');
   } catch (e) {
     console.error('❌ Reject error:', e);
     console.error('Error response:', e.response?.data);
     console.error('Request URL:', e.config?.url);
-    alert('❌ Erreur lors du rejet : ' + (e.response?.data?.error || e.message));
+    alert('❌ Error rejecting photo: ' + (e.response?.data?.error || e.message));
   } finally {
     processing.value = false;
   }
@@ -224,7 +224,7 @@ function getPhotoUrl(url) {
 }
 
 function getStatusLabel(status) {
-  return { pending: '⏳ En attente', approved: '✅ Approuvé', rejected: '❌ Rejeté' }[status] || status;
+  return { pending: '⏳ Waiting', approved: '✅ Approved', rejected: '❌ Rejected' }[status] || status;
 }
 
 function formatDate(dateString) {
@@ -242,7 +242,7 @@ function openLightbox(photo) {
 
   <!-- Cleaner Upload Zone -->
   <div v-if="props.role === 'cleaner'" class="upload-zone">
-    <h3 class="section-title">📸 Upload de Photos</h3>
+    <h3 class="section-title">📸 Upload of Photos</h3>
     <div class="drop-zone"
          :class="{ 'drag-over': isDragging }"
          @click="$refs.fileInput.click()"
@@ -251,8 +251,8 @@ function openLightbox(photo) {
          @drop.prevent="handleDrop">
       <div class="drop-zone-content">
         <div class="upload-icon">📷</div>
-        <p class="upload-text">Cliquez ou glissez vos photos ici</p>
-        <p class="upload-hint">Formats acceptés: JPG, PNG, GIF • Max 10MB par photo</p>
+        <p class="upload-text">Click or drag your photos here</p>
+        <p class="upload-hint">Accepted formats: JPG, PNG, GIF • Max 10MB per photo</p>
       </div>
     </div>
     <input ref="fileInput" type="file" multiple accept="image/*"
@@ -261,13 +261,13 @@ function openLightbox(photo) {
       <div class="preview-grid">
         <div v-for="(file, index) in selectedFiles" :key="index" class="preview-card">
           <img :src="file.preview" :alt="`Preview ${index + 1}`" />
-          <button @click="removeFile(index)" class="remove-btn" title="Supprimer">×</button>
+          <button @click="removeFile(index)" class="remove-btn" title="Remove">×</button>
         </div>
       </div>
-      <textarea v-model="message" placeholder="Ajouter un message (optionnel)" rows="3" class="message-input"></textarea>
+      <textarea v-model="message" placeholder="Add a message (optional)" rows="3" class="message-input"></textarea>
       <button @click="uploadPhotos" :disabled="uploading" class="upload-btn">
-        <span v-if="!uploading">⬆️ Envoyer {{ selectedFiles.length }} photo(s)</span>
-        <span v-else>Upload en cours...</span>
+        <span v-if="!uploading">⬆️ Upload {{ selectedFiles.length }} photo(s)</span>
+        <span v-else>Uploading...</span>
       </button>
     </div>
   </div>
@@ -275,21 +275,21 @@ function openLightbox(photo) {
   <!-- Photos List -->
   <div class="photos-list">
     <div class="list-header">
-      <h3 class="section-title">🖼️ Photos {{ props.role === 'owner' ? 'à valider' : 'uploadées' }}</h3>
+      <h3 class="section-title">🖼️ Photos {{ props.role === 'owner' ? 'to validate' : 'uploaded' }}</h3>
       <div class="stats-badges">
-        <span class="badge badge-pending">{{ stats.pending }} en attente</span>
-        <span class="badge badge-approved">{{ stats.approved }} approuvées</span>
-        <span class="badge badge-rejected">{{ stats.rejected }} rejetées</span>
+        <span class="badge badge-pending">{{ stats.pending }} pending</span>
+        <span class="badge badge-approved">{{ stats.approved }} approved</span>
+        <span class="badge badge-rejected">{{ stats.rejected }} rejected</span>
       </div>
     </div>
 
     <div v-if="loading" class="loading-state">
       <div class="spinner"></div>
-      <p>Chargement des photos...</p>
+      <p>Loading photos...</p>
     </div>
     <div v-else-if="!photos.length" class="empty-state">
       <div class="empty-icon">📭</div>
-      <p>Aucune photo pour le moment</p>
+      <p>No photos available</p>
     </div>
     <div v-else class="photos-grid">
       <div v-for="photo in photos" :key="photo.id" class="photo-card">
@@ -307,10 +307,10 @@ function openLightbox(photo) {
           <p v-if="photo.feedback" class="photo-feedback">📝 <strong>Feedback:</strong> {{ photo.feedback }}</p>
           <div v-if="props.role === 'owner' && photo.status === 'pending'" class="action-buttons">
             <button @click="approvePhoto(photo.id)" class="btn btn-approve" :disabled="processing">
-              ✓ Approuver
+              ✓ Approve
             </button>
             <button @click="showRejectModal(photo.id)" class="btn btn-reject" :disabled="processing">
-              ✗ Rejeter
+              ✗ Reject
             </button>
           </div>
         </div>
@@ -321,11 +321,11 @@ function openLightbox(photo) {
   <!-- Reject Modal -->
   <div v-if="rejectModalVisible" class="modal-overlay" @click="closeRejectModal">
     <div class="modal-content" @click.stop>
-      <h3 class="modal-title">Rejeter cette photo</h3>
-      <textarea v-model="rejectFeedback" placeholder="Raison du rejet (optionnel)" class="modal-textarea" rows="4"></textarea>
+      <h3 class="modal-title">Reject this photo</h3>
+      <textarea v-model="rejectFeedback" placeholder="Reason for rejection (optional)" class="modal-textarea" rows="4"></textarea>
       <div class="modal-actions">
-        <button @click="closeRejectModal" class="btn btn-cancel">Annuler</button>
-        <button @click="confirmReject" class="btn btn-confirm-reject">Confirmer le rejet</button>
+        <button @click="closeRejectModal" class="btn btn-cancel">Cancel</button>
+        <button @click="confirmReject" class="btn btn-confirm-reject">Confirm rejection</button>
       </div>
     </div>
   </div>

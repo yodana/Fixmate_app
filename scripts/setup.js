@@ -1,5 +1,13 @@
 import mysql from 'mysql2';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
 // import 'dotenv/config'; // Décommentez si vous utilisez un fichier .env
+
+// Pour avoir __dirname en ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 // --- 1. Configuration de la Connexion ---
 // NOTE: Utilisez les mêmes identifiants que dans server.js.
@@ -13,6 +21,39 @@ const dbConfig = {
 };
 const DB_NAME = 'fixmate_db';
 
+// ---  Fonction pour nettoyer le dossier uploads ---
+function cleanUploadsFolder() {
+    const uploadsPath = path.join(__dirname, 'uploads');
+    
+    console.log('🧹 Nettoyage du dossier uploads...');
+    
+    if (fs.existsSync(uploadsPath)) {
+        // Supprimer tous les sous-dossiers et fichiers
+        const folders = fs.readdirSync(uploadsPath);
+        
+        for (const folder of folders) {
+            const folderPath = path.join(uploadsPath, folder);
+            
+            if (fs.statSync(folderPath).isDirectory()) {
+                // Supprimer tous les fichiers dans le dossier
+                const files = fs.readdirSync(folderPath);
+                for (const file of files) {
+                    fs.unlinkSync(path.join(folderPath, file));
+                }
+                // Supprimer le dossier vide
+                fs.rmdirSync(folderPath);
+                console.log(`  ✅ Dossier supprimé: ${folder}`);
+            }
+        }
+        
+        console.log('✅ Dossier uploads nettoyé !');
+    } else {
+        // Créer le dossier uploads s'il n'existe pas
+        fs.mkdirSync(uploadsPath);
+        console.log('✅ Dossier uploads créé !');
+    }
+}
+
 // --- 2. Requêtes SQL pour la création des tables ---
 // L'ordre est important : les tables sans FK doivent être créées avant celles qui les référencent.
 const createTablesSQL = `
@@ -22,8 +63,10 @@ const createTablesSQL = `
     -- Suppression des tables dans l'ordre inverse des dépendances
     DROP TABLE IF EXISTS history_messages;
     DROP TABLE IF EXISTS user_relations;
+    DROP TABLE IF EXISTS photos;    
     DROP TABLE IF EXISTS apartments;
     DROP TABLE IF EXISTS users; 
+    
 
     -- TABLE 1 : users (Le parent principal)
     CREATE TABLE users (
@@ -99,24 +142,20 @@ const createTablesSQL = `
         INDEX idx_uploaded_at (uploaded_at)
     );
 
-    -- Vérifier les données existantes
-        SELECT * FROM photos;
-
-        -- Vérifier le nombre de photos par appartement
-        SELECT apartment_id, COUNT(*) as total, 
-            SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as pending,
-            SUM(CASE WHEN status = 'approved' THEN 1 ELSE 0 END) as approved,
-            SUM(CASE WHEN status = 'rejected' THEN 1 ELSE 0 END) as rejected
-        FROM photos 
-        GROUP BY apartment_id;
-
     -- Réactive la vérification des clés étrangères
     SET FOREIGN_KEY_CHECKS = 1; 
 `;
 
 // --- 3. Fonction principale d'initialisation ---
 async function setupDatabase() {
-    console.log(`Tentative de connexion à MySQL...`);
+    console.log('\n═══════════════════════════════════════════════');
+    console.log('🚀 INITIALISATION DE LA BASE DE DONNÉES');
+    console.log('═══════════════════════════════════════════════\n');
+    
+    // ⭐ IMPORTANT : Nettoyer uploads AVANT de toucher à la DB
+    cleanUploadsFolder();
+    
+    console.log('\n📡 Tentative de connexion à MySQL...');
     const connection = mysql.createConnection(dbConfig);
     
     try {
@@ -129,26 +168,36 @@ async function setupDatabase() {
         });
 
         // 3.1. Créer la base de données si elle n'existe pas
-        console.log(`Vérification de la base de données '${DB_NAME}'...`);
+        console.log(`\n🔍 Vérification de la base de données '${DB_NAME}'...`);
         await connection.promise().query(`CREATE DATABASE IF NOT EXISTS ${DB_NAME}`);
         console.log(`✅ Base de données '${DB_NAME}' assurée.`);
 
         // 3.2. Sélectionner la base de données
         await connection.promise().query(`USE ${DB_NAME}`);
-        console.log(`Sélection de la base de données '${DB_NAME}'.`);
+        console.log(`✅ Sélection de la base de données '${DB_NAME}'.`);
 
         // 3.3. Exécuter toutes les requêtes de création de tables
-        console.log(`Début de la création des tables...`);
+        console.log(`\n🏗️  Début de la création des tables...`);
         // La méthode d'exécution de mysql2 permet d'exécuter plusieurs requêtes d'un coup
         const [results] = await connection.promise().query(createTablesSQL);
         
         // Vous pouvez loguer les résultats si vous voulez: console.log(results);
         
-        console.log(`\n🎉 Toutes les tables ont été créées/mises à jour avec succès dans '${DB_NAME}'.`);
+        console.log('\n═══════════════════════════════════════════════');
+        console.log('🎉 SETUP TERMINÉ AVEC SUCCÈS !');
+        console.log('═══════════════════════════════════════════════');
+        console.log(`✅ Base de données: ${DB_NAME}`);
+        console.log('✅ Tables créées: users, apartments, user_relations, history_messages, photos');
+        console.log('✅ Dossier uploads nettoyé');
+        console.log('═══════════════════════════════════════════════\n');
 
     } catch (error) {
-        console.error(`\n❌ Erreur critique lors du setup de la base de données:`, error.message);
+        console.error('\n═══════════════════════════════════════════════');
+        console.error('❌ ERREUR CRITIQUE LORS DU SETUP');
+        console.error('═══════════════════════════════════════════════');
+        console.error(`Message: ${error.message}`);
         console.error(`Code erreur: ${error.code}`);
+        console.error('═══════════════════════════════════════════════\n');
     } finally {
         connection.end();
     }
